@@ -102,6 +102,16 @@ module OmniAuth
       end
 
       def client_get_token(verifier, redirect_uri)
+        # Override regular client when using setup: proc
+        if env['omniauth.params']['client_id'] && env['omniauth.params']['client_secret']
+          client = ::OAuth2::Client.new(
+            env['omniauth.params']['client_id'],
+            env['omniauth.params']['client_secret'],
+            site: options.client_options.site,
+            authorize_url: options.client_options.authorize_url,
+            token_url: options.client_options.token_url
+          )
+        end
         client.auth_code.get_token(verifier, get_token_options(redirect_uri), get_token_params)
       end
 
